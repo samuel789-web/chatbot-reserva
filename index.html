@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Chatbot Reservas</title>
+  <style>
+    body { font-family: Arial, sans-serif; background: #f0f0f0; }
+    .chatbox { width: 400px; margin: 50px auto; background: #fff; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.2); padding: 20px; }
+    .messages { max-height: 300px; overflow-y: auto; margin-bottom: 10px; }
+    .message { margin: 10px 0; }
+    .bot { color: #444; }
+    .user { text-align: right; color: #007bff; }
+    input[type="text"] { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 5px; }
+  </style>
+</head>
+<body>
+  <div class="chatbox">
+    <div class="messages" id="messages"></div>
+    <input type="text" id="userInput" placeholder="Escribe tu respuesta..." autocomplete="off"/>
+  </div>
+
+  <script>
+    const messages = document.getElementById('messages');
+    const userInput = document.getElementById('userInput');
+
+    let step = 0;
+    let reserva = { nombre: "", fecha: "", hora: "", personas: "" };
+
+    const botMessages = [
+      "¡Hola! Soy el bot de reservas. ¿Cuál es tu nombre?",
+      "Genial, ¿para qué fecha te gustaría reservar? (Ej: 25/05)",
+      "¿Y a qué hora?",
+      "¿Cuántas personas asistirán?",
+      "¡Reserva confirmada! Aquí tienes los detalles:"
+    ];
+
+    function addMessage(text, sender) {
+      const div = document.createElement("div");
+      div.classList.add("message", sender);
+      div.innerText = text;
+      messages.appendChild(div);
+      messages.scrollTop = messages.scrollHeight;
+    }
+
+    function botNextMessage() {
+      if (step < botMessages.length - 1) {
+        addMessage(botMessages[step], "bot");
+      } else {
+        let resumen = `Nombre: ${reserva.nombre}\nFecha: ${reserva.fecha}\nHora: ${reserva.hora}\nPersonas: ${reserva.personas}`;
+        addMessage(botMessages[step], "bot");
+        addMessage(resumen, "bot");
+      }
+    }
+
+    userInput.addEventListener("keypress", function(e) {
+      if (e.key === "Enter" && userInput.value.trim() !== "") {
+        let input = userInput.value.trim();
+        addMessage(input, "user");
+
+        if (step === 0) reserva.nombre = input;
+        if (step === 1) reserva.fecha = input;
+        if (step === 2) reserva.hora = input;
+        if (step === 3) reserva.personas = input;
+
+        step++;
+        userInput.value = "";
+        setTimeout(botNextMessage, 500);
+      }
+    });
+
+    // Inicia el chat
+    botNextMessage();
+  </script>
+</body>
+</html>
